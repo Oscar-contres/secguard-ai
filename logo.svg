@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="SecGuard AI">
+  <path d="M24 4 L40 10 V22 C40 32 33 40 24 44 C15 40 8 32 8 22 V10 Z" fill="#0b0f19" stroke="#00e5ff" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M15 19 L21 25 L15 31" fill="none" stroke="#00e5ff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M24 32 H32" stroke="#00ff66" stroke-width="2.8" stroke-linecap="round"/>
+</svg>
