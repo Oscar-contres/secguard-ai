@@ -35,3 +35,139 @@
 
     <section class="panel" aria-label="Panel de trabajo">
       <div class="tabs" role="tablist" aria-label="Módulos">
+        <button class="tab" role="tab" id="tab-chat" data-tab="chat" aria-controls="pane-chat" aria-selected="true">Asistente</button>
+        <button class="tab" role="tab" id="tab-code" data-tab="code" aria-controls="pane-code" aria-selected="false" tabindex="-1">Auditor de código</button>
+        <button class="tab" role="tab" id="tab-headers" data-tab="headers" aria-controls="pane-headers" aria-selected="false" tabindex="-1">Cabeceras HTTP</button>
+        <button class="tab" role="tab" id="tab-password" data-tab="password" aria-controls="pane-password" aria-selected="false" tabindex="-1">Contraseña</button>
+      </div>
+
+      <!-- Asistente -->
+      <div class="pane" id="pane-chat" role="tabpanel" aria-labelledby="tab-chat">
+        <label class="field-label" for="chat-input">Escribe tu duda o pega un fragmento</label>
+        <textarea id="chat-input" rows="5" spellcheck="false" placeholder="Ej. ¿Cómo configuro Content-Security-Policy para una app React?"></textarea>
+        <div class="actions">
+          <button class="btn primary" id="chat-send" type="button">Consultar</button>
+          <span class="hint">Ctrl + Enter para enviar. Solo asistencia defensiva.</span>
+        </div>
+        <div class="templates" aria-label="Plantillas de consulta">
+          <button class="chip" type="button" data-prompt="¿Cómo asegurar un servidor Nginx?">¿Cómo asegurar un servidor Nginx?</button>
+          <button class="chip" type="button" data-prompt="¿Cómo proteger mi aplicación de ataques XSS?">¿Cómo proteger mi aplicación de ataques XSS?</button>
+          <button class="chip" type="button" data-prompt="¿Qué cabeceras HTTP de seguridad necesito y por qué?">¿Qué cabeceras HTTP de seguridad necesito?</button>
+          <button class="chip" type="button" data-prompt="¿Cómo almacenar contraseñas de forma segura en una aplicación?">¿Cómo almacenar contraseñas de forma segura?</button>
+        </div>
+      </div>
+
+      <!-- Auditor de código -->
+      <div class="pane" id="pane-code" role="tabpanel" aria-labelledby="tab-code" hidden>
+        <div class="row">
+          <label class="field-label" for="code-lang">Lenguaje o archivo</label>
+          <select id="code-lang">
+            <option value="python">Python</option>
+            <option value="javascript">JavaScript</option>
+            <option value="sql">SQL</option>
+            <option value="php">PHP</option>
+            <option value="dockerfile">Dockerfile</option>
+            <option value="nginx">nginx.conf</option>
+            <option value="env">.env (plantilla)</option>
+          </select>
+        </div>
+        <label class="field-label" for="code-input">Pega el fragmento a auditar</label>
+        <textarea id="code-input" class="mono" rows="12" spellcheck="false" placeholder="# Pega aquí el código. Se revisa en tu navegador y después la IA propone la versión corregida."></textarea>
+        <div class="actions">
+          <button class="btn primary" id="code-send" type="button">Auditar código</button>
+          <span class="hint">Antes de enviar se buscan claves o contraseñas.</span>
+        </div>
+      </div>
+
+      <!-- Cabeceras HTTP -->
+      <div class="pane" id="pane-headers" role="tabpanel" aria-labelledby="tab-headers" hidden>
+        <label class="field-label" for="headers-url">URL del sitio (opcional, para el reporte)</label>
+        <input id="headers-url" type="url" placeholder="https://tu-sitio.com">
+        <label class="field-label" for="headers-input">Pega las cabeceras de respuesta</label>
+        <textarea id="headers-input" class="mono" rows="9" spellcheck="false" placeholder="strict-transport-security: max-age=31536000&#10;content-security-policy: default-src 'self'&#10;x-frame-options: DENY"></textarea>
+        <div class="actions">
+          <button class="btn primary" id="headers-send" type="button">Evaluar cabeceras</button>
+          <span class="hint">Copia las cabeceras desde las herramientas de desarrollador, pestaña Red.</span>
+        </div>
+      </div>
+
+      <!-- Contraseña -->
+      <div class="pane" id="pane-password" role="tabpanel" aria-labelledby="tab-password" hidden>
+        <label class="field-label" for="pw-input">Contraseña a evaluar</label>
+        <div class="pw-row">
+          <input id="pw-input" type="password" autocomplete="off" spellcheck="false" aria-describedby="pw-note">
+          <button class="btn ghost" id="pw-toggle" type="button" aria-pressed="false">Mostrar</button>
+        </div>
+        <div class="meter" aria-hidden="true"><div class="meter-fill" id="pw-fill"></div></div>
+        <p class="hint" id="pw-note">Se analiza en tu navegador. No se envía, no se guarda y no aparece en la consola.</p>
+        <dl class="stats">
+          <div><dt>Longitud</dt><dd id="pw-len">0</dd></div>
+          <div><dt>Entropía estimada</dt><dd id="pw-bits">0 bits</dd></div>
+          <div><dt>Nivel</dt><dd id="pw-level">—</dd></div>
+        </dl>
+        <ul class="issues" id="pw-issues"></ul>
+      </div>
+    </section>
+
+    <aside class="panel results" aria-labelledby="res-title">
+      <div class="console-head">
+        <h2 id="res-title">Consola de resultados</h2>
+        <label class="toggle"><input type="checkbox" id="typewriter" checked> Efecto máquina de escribir</label>
+      </div>
+
+      <div class="console" id="console" role="log" aria-live="polite" tabindex="0">
+        <p class="line muted">$ secguard --listo. Elige una auditoría o escribe una consulta.</p>
+      </div>
+
+      <div class="risk">
+        <svg class="gauge" viewBox="0 0 120 120" role="img" aria-label="Puntuación de riesgo">
+          <circle class="gauge-track" cx="60" cy="60" r="50"></circle>
+          <circle class="gauge-value" id="gauge-value" cx="60" cy="60" r="50"></circle>
+        </svg>
+        <div>
+          <p class="label">Puntuación de riesgo</p>
+          <p class="score" id="risk-score">—</p>
+          <p class="hint" id="risk-level">Sin análisis todavía</p>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn ghost" id="export-txt" type="button" disabled>Descargar .txt</button>
+        <button class="btn ghost" id="export-pdf" type="button" disabled>Descargar PDF</button>
+      </div>
+
+      <div class="history">
+        <div class="console-head">
+          <h3 class="history-title">Historial de esta sesión</h3>
+          <button class="btn ghost small" id="history-clear" type="button">Borrar</button>
+        </div>
+        <ol class="history-list" id="history-list"></ol>
+      </div>
+    </aside>
+
+  </main>
+
+  <!-- Diálogo: datos sensibles detectados antes de enviar -->
+  <div class="dialog" id="sanitize-dialog" role="alertdialog" aria-modal="true" aria-labelledby="sd-title" aria-describedby="sd-desc" hidden>
+    <div class="dialog-box">
+      <h2 id="sd-title">Posible dato sensible detectado</h2>
+      <p class="hint" id="sd-desc">Antes de enviar, conviene quitar claves, contraseñas o tokens reales. Así no quedan expuestos.</p>
+      <ul class="issues" id="sd-list"></ul>
+      <div class="actions">
+        <button class="btn primary" id="sd-redact" type="button">Redactar y enviar</button>
+        <button class="btn ghost" id="sd-cancel" type="button">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="foot">
+    SecGuard AI · Uso defensivo, solo sobre sistemas propios o con autorización. No almacena tus datos.
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+  <script src="security.js" defer></script>
+  <script src="intent.js" defer></script>
+  <script src="infra.js" defer></script>
+  <script src="script.js" defer></script>
+</body>
+</html>
