@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SecGuard AI · Auditor defensivo</title>
+  <meta name="description" content="Asistente defensivo de ciberseguridad: auditoría de código, revisión de cabeceras HTTP y fortaleza de contraseñas.">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <link rel="icon" href="logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <a class="skip" href="#workspace">Ir al panel de trabajo</a>
+
+  <header class="topbar">
+    <div class="brand">
+      <img src="logo.svg" width="36" height="36" alt="" aria-hidden="true">
+      <span class="brand-name">SecGuard<span class="accent">AI</span></span>
+    </div>
+    <div class="status" role="status">
+      <span class="dot" aria-hidden="true"></span>
+      <span>Sistema seguro · En línea</span>
+    </div>
+  </header>
+
+  <section class="quick" aria-label="Auditorías rápidas">
+    <button class="quick-btn" type="button" data-open="password">Analizar contraseña</button>
+    <button class="quick-btn" type="button" data-open="headers">Revisar cabeceras HTTP</button>
+    <button class="quick-btn" type="button" data-open="code">Auditar fragmento de código</button>
+  </section>
+
+  <main class="layout" id="workspace">
+
+    <section class="panel" aria-label="Panel de trabajo">
+      <div class="tabs" role="tablist" aria-label="Módulos">
