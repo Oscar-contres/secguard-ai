@@ -218,11 +218,6 @@
     var list = readHistory();
     list.unshift({ time: new Date().toISOString(), title: title, risk: risk, lines: lines });
     saveHistory(list.slice(0, HISTORY_MAX));
-    renderHistory();
-  }
-
-  function restoreEntry(entry) {
-    var lines = Array.isArray(entry.lines) ? entry.lines : [];
     consoleEl.textContent = '';
     reportLines = lines.slice();
     lines.forEach(function (line) { addLine(line, ''); });
@@ -262,16 +257,6 @@
   async function runAI(message, label) {
     var stop = startBusy(label);
     try {
-      var reply = await askAI(message);
-      stop();
-      writeBlock(reply || 'La respuesta llegó vacía.', '');
-      var risk = parseRisk(reply);
-      if (risk !== null) setRisk(risk);
-    } catch (err) {
-      stop();
-      write('[ERROR] ' + err.message + ' El análisis local sigue disponible.', 'err');
-    }
-    enableExport();
   }
 
   // ---------- Módulos ----------
@@ -308,6 +293,7 @@
       : T.quickCodeScan(code, lang);
     if (!findings.length) {
       write('Análisis local: no se encontraron patrones de riesgo conocidos.', 'ok');
+      write('El escáner local solo revisa patrones de texto conocidos. Que no aparezca un hallazgo no significa que el código sea seguro.', 'muted');
     }
     findings.forEach(function (f) {
       var where = f.line ? 'línea ' + f.line + ': ' : '';
@@ -327,6 +313,10 @@
     var raw = $('headers-input').value;
     if (!raw.trim()) {
       write('[AVISO] Pega las cabeceras de respuesta primero.', 'warn');
+      return;
+    }
+    if (!T.looksLikeHeaders(raw)) {
+      write('[AVISO] El texto no parece una lista de cabeceras. Cada línea debe tener el formato "nombre: valor". Cópialas desde la pestaña Red de las herramientas de desarrollador.', 'warn');
       return;
     }
     var url = $('headers-url').value.trim();
