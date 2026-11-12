@@ -140,6 +140,19 @@
     return map;
   }
 
+  // Indica si el texto parece una lista de cabeceras: la mayoría de sus
+  // líneas no vacías debe tener el formato "nombre: valor".
+  function looksLikeHeaders(raw) {
+    var lines = String(raw || '').split(/\r?\n/).filter(function (l) {
+      return l.trim() !== '';
+    });
+    if (!lines.length) return false;
+    var valid = lines.filter(function (l) {
+      return /^[A-Za-z0-9-]+:\s*\S/.test(l.trim());
+    }).length;
+    return valid > 0 && valid / lines.length >= 0.6;
+  }
+
   function evaluateHeaders(map, opts) {
     opts = opts || {};
     var checks = [];
@@ -225,7 +238,11 @@
       { severity: 'high', title: 'eval() ejecuta texto como código', re: /\beval\s*\(/ },
       { severity: 'high', title: 'innerHTML con contenido dinámico (posible XSS)', re: /\.innerHTML\s*\+?=(?!=)/ },
       { severity: 'medium', title: 'document.write puede insertar contenido no confiable', re: /document\.write\s*\(/ },
-      { severity: 'medium', title: 'Redirección con datos de la URL sin validar', re: /location(\.href)?\s*=.*(location\.search|params|query)/ }
+      { severity: 'medium', title: 'Redirección con datos de la URL sin validar', re: /location(\.href)?\s*=.*(location\.search|params|query)/ },
+      { severity: 'high', title: 'Consulta SQL armada con "+" (posible inyección SQL)', re: /["'][^"'\n]*\b(?:SELECT\b[^"'\n]*\bFROM|INSERT\s+INTO|UPDATE\b[^"'\n]*\bSET|DELETE\s+FROM)\b[^"'\n]*["']\s*\+/i },
+      { severity: 'high', title: 'Consulta SQL con datos insertados en una plantilla (posible inyección SQL)', re: /`[^`\n]*\b(?:SELECT\b[^`\n]*\bFROM|INSERT\s+INTO|UPDATE\b[^`\n]*\bSET|DELETE\s+FROM)\b[^`\n]*\$\{/i },
+      { severity: 'high', title: 'Lectura de archivo con datos de la petición (posible path traversal)', re: /\b(?:readFile|readFileSync|createReadStream|sendFile)\s*\([^)]*\b(?:req|request)\.(?:query|params|body)\b/ },
+      { severity: 'medium', title: 'Lectura de archivo con ruta variable. Si la ruta viene del usuario, puede exponer archivos ajenos.', re: /\b(?:readFile|readFileSync|createReadStream|sendFile)\s*\(\s*(?!req\.|request\.)[A-Za-z_$]/ }
     ],
     python: [
       { severity: 'high', title: 'eval() o exec() con texto dinámico', re: /\b(eval|exec)\s*\(/ },
@@ -275,6 +292,7 @@
     findSecrets: findSecrets,
     redactSecrets: redactSecrets,
     parseHeaders: parseHeaders,
+    looksLikeHeaders: looksLikeHeaders,
     evaluateHeaders: evaluateHeaders,
     quickCodeScan: quickCodeScan
   };
